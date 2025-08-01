@@ -1,5 +1,3 @@
-use core::f64;
-
 use zharko::{
     math::{Ray, Vec3},
     renderers::{Color, Image, Renderer, PPM},

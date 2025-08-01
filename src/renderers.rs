@@ -1,5 +1,4 @@
 pub mod ppm;
-use std::ops::{Index, IndexMut};
 
 pub use ppm::PPM;
 
@@ -51,7 +50,7 @@ impl Image {
     /// Fills rectangle with the upper-left corner at `(x,y)` and with the provided width
     /// and height
     pub fn fill_rect(&mut self, x: usize, y: usize, width: usize, height: usize, color: Color) {
-        if y + height >= self.height || x + width >= self.width || x < 0 || y < 0 {
+        if y + height >= self.height || x + width >= self.width {
             panic!(
                 "Rectangle at ({}, {}) with size ({}, {}) out of bounds",
                 x, y, width, height
