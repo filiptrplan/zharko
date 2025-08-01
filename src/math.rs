@@ -75,21 +75,48 @@ impl Mul<Vec3> for f64 {
     }
 }
 
-// Element-wise multiplication (Vec3 * Vec3)
-impl Mul<Vec3> for Vec3 {
+// Scalar multiplication (Vec3 * usize)
+impl Mul<usize> for Vec3 {
     type Output = Vec3;
 
-    fn mul(self, rhs: Vec3) -> Self::Output {
-        Vec3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
+    fn mul(self, scalar: usize) -> Self::Output {
+        let scalar_f64 = scalar as f64;
+        Vec3::new(
+            self.x * scalar_f64,
+            self.y * scalar_f64,
+            self.z * scalar_f64,
+        )
     }
 }
-
 // Scalar division
 impl Div<f64> for Vec3 {
     type Output = Vec3;
 
     fn div(self, scalar: f64) -> Self::Output {
         Vec3::new(self.x / scalar, self.y / scalar, self.z / scalar)
+    }
+}
+
+// Scalar division (Vec3 / usize)
+impl Div<usize> for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, scalar: usize) -> Self::Output {
+        let scalar_f64 = scalar as f64;
+        Vec3::new(
+            self.x / scalar_f64,
+            self.y / scalar_f64,
+            self.z / scalar_f64,
+        )
+    }
+}
+
+// Element-wise multiplication (Vec3 * Vec3)
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
     }
 }
 
