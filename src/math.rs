@@ -1,6 +1,13 @@
 use std::ops::{Add, Div, Mul, Sub};
 
 use crate::renderers::{self, Color};
+pub mod hittables;
+
+const PI: f64 = 3.1415926535897932385;
+
+pub fn degrees_to_radians(degrees: f64) -> f64 {
+    degrees * PI / 180.0
+}
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3 {
@@ -37,6 +44,10 @@ impl Vec3 {
     pub fn unit(&self) -> Vec3 {
         let len = self.length();
         Vec3::new(self.x / len, self.y / len, self.z / len)
+    }
+
+    pub fn length_squared(&self) -> f64 {
+        self.length().powi(2)
     }
 }
 
@@ -146,4 +157,37 @@ impl Ray {
     pub fn at(&self, t: f64) -> Vec3 {
         self.origin + t * self.dir
     }
+}
+
+pub struct HitRecord {
+    pub point: Vec3,
+    pub normal: Vec3,
+    /// This is the scalar of the ray we hit it at
+    pub t: f64,
+    /// Tracks whether we hit the front face of the object
+    pub front_face: bool,
+}
+
+impl HitRecord {
+    /// Sets the normal vector of the hit record. The `outward_normal` parameter is the normal that
+    /// points to the outside of the object.
+    /// This function sets the normal so it always points to the origin of the ray.
+    /// We assume that outward_normal has a unit length.
+    pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
+        self.front_face = r.dir.dot(outward_normal) < 0.0;
+        if self.front_face {
+            self.normal = outward_normal.clone();
+        } else {
+            self.normal = -1.0 * (outward_normal.clone());
+        }
+    }
+}
+
+pub enum HitResult {
+    NoHit,
+    Hit(HitRecord),
+}
+
+pub trait Hittable {
+    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> HitResult;
 }
