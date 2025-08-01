@@ -4,9 +4,9 @@ use crate::renderers::{self, Color};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vec3 {
@@ -134,8 +134,8 @@ impl From<Vec3> for renderers::Color {
 /// It also implements the function `at` that can calculate any point along the ray at a certain
 /// scalar `t`
 pub struct Ray {
-    origin: Vec3,
-    dir: Vec3,
+    pub origin: Vec3,
+    pub dir: Vec3,
 }
 
 impl Ray {
