@@ -2,7 +2,7 @@ use core::f64;
 
 use zharko::{
     math::{Ray, Vec3},
-    renderers::{Color, Image, Renderer, PPM},
+    renderers::{Image, Renderer, PPM},
 };
 
 const IMAGE_WIDTH: usize = 500;
@@ -11,11 +11,27 @@ const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const VIEWPORT_HEIGHT: f64 = 2.0;
 const FOCAL_LENGTH: f64 = 1.0;
 
-fn ray_color(r: &Ray) -> Color {
+/// This function calculate whether the ray `r` hits the sphere with a certain radius and center.
+/// The body of the function is derived from the equation for the sphere and we are just looking
+/// for whether it has a solution aka we are examining the discriminant.
+fn hit_sphere(center: Vec3, radius: f64, r: &Ray) -> bool {
+    let oc = center - r.origin;
+    let a = r.dir.dot(&r.dir);
+    let b = -2.0 * oc.dot(&r.dir);
+    let c = oc.dot(&oc) - radius * radius;
+    let discriminant = b * b - a * c * 4.0;
+    discriminant >= 0.0
+}
+
+fn ray_color(r: &Ray) -> Vec3 {
+    if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r) {
+        return Vec3::new(1.0, 0.0, 0.0);
+    }
+
     let unit_dir = r.dir.unit();
     let a = 0.5 * (unit_dir.y + 1.0);
 
-    ((1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0)).into()
+    (1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0)
 }
 
 fn main() {
@@ -54,7 +70,7 @@ fn main() {
             let ray = Ray::new(pixel_center, ray_dir);
             let color = ray_color(&ray);
 
-            image.set_pixel(i, j, color);
+            image.set_pixel(i, j, color.into());
         }
     }
 
