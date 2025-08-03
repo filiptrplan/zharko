@@ -4,6 +4,7 @@ use std::{
 };
 
 use interval::Interval;
+use rand::Rng;
 
 use crate::renderers::{self, Color};
 pub mod hittables;
@@ -51,7 +52,49 @@ impl Vec3 {
     }
 
     pub fn length_squared(&self) -> f64 {
-        self.length().powi(2)
+        self.dot(self)
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::rng();
+        Self::new(
+            rng.random_range(0.0..1.0),
+            rng.random_range(0.0..1.0),
+            rng.random_range(0.0..1.0),
+        )
+    }
+
+    /// Generates a random vector on the surface of the unit sphere
+    pub fn random_unit_vector() -> Self {
+        // We use rejection sampling because it is much harder to directly generate
+        // uniformly distributed points on a sphere
+        loop {
+            let p = Vec3::random_range(-1.0, 1.0);
+            let l = p.length_squared();
+            if 1e-16 < l && l <= 1.0 {
+                return p / l.sqrt();
+            }
+        }
+    }
+
+    /// Generates a random unit vector on the hemisphere described by normal
+    pub fn random_on_hemisphere(normal: Vec3) -> Self {
+        let on_unit_sphere = Vec3::random_unit_vector();
+        if on_unit_sphere.dot(&normal.unit()) >= 0.0 {
+            on_unit_sphere
+        } else {
+            -1.0 * on_unit_sphere
+        }
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Self {
+        let mut rng = rand::rng();
+        let range = min..max;
+        Self::new(
+            rng.random_range(range.clone()),
+            rng.random_range(range.clone()),
+            rng.random_range(range),
+        )
     }
 }
 
