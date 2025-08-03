@@ -3,6 +3,7 @@ use core::f64;
 use zharko::{
     math::{
         hittables::{HittableList, Sphere},
+        interval::Interval,
         HitResult, Hittable, Ray, Vec3,
     },
     renderers::{Image, Renderer, PPM},
@@ -15,7 +16,7 @@ const VIEWPORT_HEIGHT: f64 = 2.0;
 const FOCAL_LENGTH: f64 = 1.0;
 
 fn ray_color(r: &Ray, world: impl Hittable) -> Vec3 {
-    match world.hit(r, 0.0, f64::INFINITY) {
+    match world.hit(r, Interval::new(0.0, f64::INFINITY)) {
         HitResult::Hit(rec) => {
             return 0.5 * (rec.normal.unit() + Vec3::new(1.0, 1.0, 1.0));
         }

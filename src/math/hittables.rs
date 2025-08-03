@@ -1,4 +1,4 @@
-use super::{HitRecord, HitResult, Hittable, Ray, Vec3};
+use super::{interval::Interval, HitRecord, HitResult, Hittable, Ray, Vec3};
 
 pub struct HittableList {
     pub objects: Vec<Box<dyn Hittable>>,
@@ -23,12 +23,12 @@ impl Default for HittableList {
 }
 
 impl Hittable for &HittableList {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> HitResult {
+    fn hit(&self, r: &Ray, ray_t: Interval) -> HitResult {
         let mut res = HitResult::NoHit;
-        let mut closest_so_far = ray_tmax;
+        let mut closest_so_far = ray_t.max;
 
         for obj in &self.objects {
-            match obj.hit(r, ray_tmin, ray_tmax) {
+            match obj.hit(r, Interval::new(ray_t.min, closest_so_far)) {
                 HitResult::NoHit => (),
                 HitResult::Hit(rec) => {
                     if closest_so_far > rec.t {
@@ -55,7 +55,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &super::Ray, ray_tmin: f64, ray_tmax: f64) -> HitResult {
+    fn hit(&self, r: &super::Ray, ray_t: Interval) -> HitResult {
         let oc = self.center - r.origin;
         let a = r.dir.length_squared();
         let h = oc.dot(&r.dir);
@@ -70,9 +70,9 @@ impl Hittable for Sphere {
 
         // Find the nearest root that lies within the specified range
         let mut root = (h - sqrtd) / a;
-        if root <= ray_tmin || root >= ray_tmax {
+        if !ray_t.surrounds(root) {
             root = (h + sqrtd) / a;
-            if root <= ray_tmin || root >= ray_tmax {
+            if !ray_t.surrounds(root) {
                 return HitResult::NoHit;
             }
         }

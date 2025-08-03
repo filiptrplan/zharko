@@ -1,7 +1,10 @@
 use std::ops::{Add, Div, Mul, Sub};
 
+use interval::Interval;
+
 use crate::renderers::{self, Color};
 pub mod hittables;
+pub mod interval;
 
 const PI: f64 = 3.1415926535897932385;
 
@@ -189,5 +192,5 @@ pub enum HitResult {
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> HitResult;
+    fn hit(&self, r: &Ray, ray_t: Interval) -> HitResult;
 }
