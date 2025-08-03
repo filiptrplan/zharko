@@ -1,3 +1,4 @@
+use indicatif::ProgressBar;
 use rand::Rng;
 
 use crate::{
@@ -80,7 +81,10 @@ impl Camera {
     }
 
     pub fn render(&mut self, renderer: impl Renderer, world: &impl Hittable) {
+        let bar = ProgressBar::new(self.image.height as u64);
+
         for j in 0..self.image.height {
+            bar.inc(1);
             for i in 0..self.image.width {
                 let mut color = Vec3::new(0.0, 0.0, 0.0);
 
@@ -95,6 +99,7 @@ impl Camera {
             }
         }
 
+        bar.finish();
         renderer.draw(&self.image);
     }
 
