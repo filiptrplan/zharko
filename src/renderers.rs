@@ -3,7 +3,7 @@ pub mod ppm;
 pub use ppm::PPM;
 
 pub trait Renderer {
-    fn draw(self, image: Image);
+    fn draw(self, image: &Image);
 }
 
 #[derive(Clone, Copy)]
@@ -15,8 +15,8 @@ pub struct Color {
 
 pub struct Image {
     pixels: Vec<Vec<Color>>,
-    width: usize,
-    height: usize,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl Color {

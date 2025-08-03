@@ -2,6 +2,8 @@ use std::fs;
 
 use indicatif::ProgressBar;
 
+use super::Image;
+
 #[derive(Default)]
 pub struct PPM {}
 
@@ -14,7 +16,7 @@ impl PPM {
 const OUTPUT_FILE: &str = "test.ppm";
 
 impl super::Renderer for PPM {
-    fn draw(self, image: super::Image) {
+    fn draw(self, image: &Image) {
         let mut buffer = String::new();
 
         let bar = ProgressBar::new(image.height as u64);

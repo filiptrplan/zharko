@@ -15,7 +15,7 @@ const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const VIEWPORT_HEIGHT: f64 = 2.0;
 const FOCAL_LENGTH: f64 = 1.0;
 
-fn ray_color(r: &Ray, world: impl Hittable) -> Vec3 {
+fn ray_color(r: &Ray, world: &impl Hittable) -> Vec3 {
     match world.hit(r, Interval::new(0.0, f64::INFINITY)) {
         HitResult::Hit(rec) => {
             return 0.5 * (rec.normal.unit() + Vec3::new(1.0, 1.0, 1.0));
@@ -74,5 +74,5 @@ fn main() {
         }
     }
 
-    renderer.draw(image);
+    renderer.draw(&image);
 }

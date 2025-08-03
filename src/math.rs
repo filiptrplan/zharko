@@ -1,12 +1,13 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::{
+    f64::consts::PI,
+    ops::{Add, Div, Mul, Sub},
+};
 
 use interval::Interval;
 
 use crate::renderers::{self, Color};
 pub mod hittables;
 pub mod interval;
-
-const PI: f64 = 3.1415926535897932385;
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0
@@ -136,10 +137,11 @@ impl Mul<Vec3> for Vec3 {
 
 impl From<Vec3> for renderers::Color {
     fn from(val: Vec3) -> Self {
+        let interval = Interval::new(0.0, 0.9999);
         Color::new(
-            (val.x * 255.99) as u8,
-            (val.y * 255.99) as u8,
-            (val.z * 255.99) as u8,
+            (interval.clamp(val.x) * 256.0) as u8,
+            (interval.clamp(val.y) * 256.0) as u8,
+            (interval.clamp(val.z) * 256.0) as u8,
         )
     }
 }
@@ -179,9 +181,9 @@ impl HitRecord {
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
         self.front_face = r.dir.dot(outward_normal) < 0.0;
         if self.front_face {
-            self.normal = outward_normal.clone();
+            self.normal = *outward_normal;
         } else {
-            self.normal = -1.0 * (outward_normal.clone());
+            self.normal = -1.0 * (*outward_normal);
         }
     }
 }

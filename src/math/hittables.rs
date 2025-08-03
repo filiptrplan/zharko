@@ -22,7 +22,7 @@ impl Default for HittableList {
     }
 }
 
-impl Hittable for &HittableList {
+impl Hittable for HittableList {
     fn hit(&self, r: &Ray, ray_t: Interval) -> HitResult {
         let mut res = HitResult::NoHit;
         let mut closest_so_far = ray_t.max;

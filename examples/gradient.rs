@@ -56,5 +56,5 @@ fn main() {
         }
     }
 
-    renderer.draw(image);
+    renderer.draw(&image);
 }
