@@ -2,13 +2,12 @@ use indicatif::ProgressBar;
 use rand::Rng;
 
 use crate::{
-    math::{interval::Interval, HitResult, Hittable, Ray, Vec3},
+    math::{degrees_to_radians, interval::Interval, HitResult, Hittable, Ray, Vec3},
     renderers::{Image, Renderer},
 };
 
 pub struct CameraBuilder {}
 
-const VIEWPORT_HEIGHT: f64 = 2.0;
 const FOCAL_LENGTH: f64 = 1.0;
 
 pub struct Camera {
@@ -28,9 +27,15 @@ impl Camera {
         let image_width = image.width;
         let image_height = image.height;
 
+        // Calculate viewport dimensions
+        let vfov = 90.0;
+        let theta = degrees_to_radians(vfov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h * FOCAL_LENGTH;
+
         // We re-calculate the aspect ratio because when calculating the image width we can
         // introduce rounding errors.
-        let viewport_width = VIEWPORT_HEIGHT * (image_width as f64 / image_height as f64);
+        let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
         // Camera is placed at origin
         let camera_center = Vec3::new(0.0, 0.0, 0.0);
@@ -38,7 +43,7 @@ impl Camera {
         // We are using right-handed coordinates: y is up, x is right, negative z is the camera dir
         // Vectors describing the viewport
         let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -VIEWPORT_HEIGHT, 0.0);
+        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
 
         // Pixel-to-pixel deltas
         let pixel_delta_u = viewport_u / image_width as f64;
