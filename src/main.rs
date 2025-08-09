@@ -22,6 +22,8 @@ fn main() {
     let image = Image::new(IMAGE_WIDTH, image_height);
     let mut camera = Camera::new(image);
 
+    camera.set_camera_pos(Vec3::new(-2.0, 2.0, 1.0), Vec3::new(0.0, 0.0, -1.0));
+
     let r = (f64::consts::PI / 4.0).cos();
 
     // Materials
