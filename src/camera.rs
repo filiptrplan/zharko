@@ -110,6 +110,15 @@ impl Camera {
         renderer.draw(&self.image);
     }
 
+    pub fn set_samples_per_pixel(&mut self, samples: u8) {
+        self.samples_per_pixel = samples;
+        self.pixel_scale_factor = 1.0 / samples as f64;
+    }
+
+    pub fn set_max_depth(&mut self, depth: i32) {
+        self.max_depth = depth;
+    }
+
     fn ray_color(r: &Ray, depth: i32, world: &impl Hittable) -> Vec3 {
         if depth <= 0 {
             return Vec3::zero();
