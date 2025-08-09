@@ -42,17 +42,23 @@ impl Material for Lambertian {
 /// A reflective material
 pub struct Metal {
     albedo: Vec3,
+    fuzziness: f64,
 }
 
 impl Metal {
-    pub fn new(albedo: Vec3) -> Self {
-        Self { albedo }
+    pub fn new(albedo: Vec3, fuzziness: f64) -> Self {
+        Self { albedo, fuzziness }
     }
 }
 
 impl Material for Metal {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<ScatterResult> {
-        let reflected = reflect(&r.dir, &rec.normal);
+        let reflected =
+            reflect(&r.dir, &rec.normal).unit() + (self.fuzziness * Vec3::random_unit_vector());
+        // If the reflected fuzzed ray is below the surface, we just absorb the ray
+        if reflected.dot(&rec.normal) < 0.0 {
+            return None;
+        }
         Some(ScatterResult {
             scattered: Ray::new(rec.point, reflected),
             attenuation: self.albedo,
