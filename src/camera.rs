@@ -21,6 +21,13 @@ pub struct Camera {
     image: Image,
     max_depth: i32,
     vfov: f64,
+    lookfrom: Vec3,
+    lookat: Vec3,
+    vup: Vec3,
+    /// The three basis vectors for the camera coordinate system
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
 }
 
 impl Camera {
@@ -36,9 +43,15 @@ impl Camera {
             pixel00_loc: Vec3::zero(),
             image,
             vfov,
+            lookat: Vec3::new(0.0, 0.0, -1.0),
+            lookfrom: Vec3::zero(),
+            u: Vec3::zero(),
+            vup: Vec3::new(0.0, 1.0, 0.0),
+            v: Vec3::zero(),
+            w: Vec3::zero(),
         };
-        
-        camera.calculate_viewport();
+
+        camera.initialize();
         camera
     }
 
@@ -95,39 +108,47 @@ impl Camera {
 
     pub fn set_vfov(&mut self, vfov: f64) {
         self.vfov = vfov;
-        self.calculate_viewport();
+        self.initialize();
     }
 
-    fn calculate_viewport(&mut self) {
+    pub fn set_camera_pos(&mut self, lookfrom: Vec3, lookat: Vec3) {
+        self.lookat = lookat;
+        self.lookfrom = lookfrom;
+        self.initialize();
+    }
+
+    fn initialize(&mut self) {
         let image_width = self.image.width;
         let image_height = self.image.height;
 
+        self.camera_center = self.lookfrom;
+
         // Calculate viewport dimensions
+        let focal_length = (self.lookfrom - self.lookat).length();
         let theta = degrees_to_radians(self.vfov);
         let h = (theta / 2.0).tan();
-        let viewport_height = 2.0 * h * FOCAL_LENGTH;
+        let viewport_height = 2.0 * h * focal_length;
 
         // We re-calculate the aspect ratio because when calculating the image width we can
         // introduce rounding errors.
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
-        // Camera is placed at origin
-        self.camera_center = Vec3::new(0.0, 0.0, 0.0);
+        self.w = (self.lookfrom - self.lookat).unit();
+        self.u = self.vup.cross(&self.w);
+        self.v = self.w.cross(&self.u);
 
         // We are using right-handed coordinates: y is up, x is right, negative z is the camera dir
         // Vectors describing the viewport
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+        let viewport_u = viewport_width * self.u;
+        let viewport_v = viewport_height * -1.0 * self.v;
 
         // Pixel-to-pixel deltas
         self.pixel_delta_u = viewport_u / image_width as f64;
         self.pixel_delta_v = viewport_v / image_height as f64;
 
         // Location of the upper left pixel
-        let viewport_upper_left = self.camera_center
-            - Vec3::new(0.0, 0.0, FOCAL_LENGTH)
-            - (viewport_u / 2.0)
-            - (viewport_v / 2.0);
+        let viewport_upper_left =
+            self.camera_center - (focal_length * self.w) - (viewport_u / 2.0) - (viewport_v / 2.0);
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
     }
 
