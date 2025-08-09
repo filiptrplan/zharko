@@ -7,6 +7,7 @@ use std::{
 use interval::Interval;
 use materials::Material;
 use rand::Rng;
+use rand::random;
 
 use crate::renderers::{self, Color};
 pub mod hittables;
@@ -87,11 +88,11 @@ impl Vec3 {
     }
 
     pub fn random() -> Self {
-        let mut rng = rand::rng();
+        // Use rand::random::<f64>() for values in [0,1)
         Self::new(
-            rng.random_range(0.0..1.0),
-            rng.random_range(0.0..1.0),
-            rng.random_range(0.0..1.0),
+            rand::random::<f64>(),
+            rand::random::<f64>(),
+            rand::random::<f64>(),
         )
     }
 
