@@ -186,13 +186,24 @@ impl Mul<Vec3> for Vec3 {
     }
 }
 
+fn linear_to_gamma(x: f64) -> f64 {
+    if x > 0.0 {
+        x.sqrt()
+    } else {
+        0.0
+    }
+}
+
 impl From<Vec3> for renderers::Color {
     fn from(val: Vec3) -> Self {
         let interval = Interval::new(0.0, 0.9999);
+        let r = linear_to_gamma(val.x);
+        let g = linear_to_gamma(val.y);
+        let b = linear_to_gamma(val.z);
         Color::new(
-            (interval.clamp(val.x) * 256.0) as u8,
-            (interval.clamp(val.y) * 256.0) as u8,
-            (interval.clamp(val.z) * 256.0) as u8,
+            (interval.clamp(r) * 256.0) as u8,
+            (interval.clamp(g) * 256.0) as u8,
+            (interval.clamp(b) * 256.0) as u8,
         )
     }
 }
