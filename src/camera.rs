@@ -11,7 +11,7 @@ pub struct CameraBuilder {}
 const FOCAL_LENGTH: f64 = 1.0;
 
 pub struct Camera {
-    samples_per_pixel: u8,
+    samples_per_pixel: u16,
     /// How much should we scale the color of each sample for a pixel
     pixel_scale_factor: f64,
     camera_center: Vec3,
@@ -131,7 +131,7 @@ impl Camera {
         renderer.draw(&self.image);
     }
 
-    pub fn set_samples_per_pixel(&mut self, samples: u8) {
+    pub fn set_samples_per_pixel(&mut self, samples: u16) {
         self.samples_per_pixel = samples;
         self.pixel_scale_factor = 1.0 / samples as f64;
     }
@@ -187,7 +187,7 @@ impl Camera {
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
 
         // Calculate the defocus disk dimensions
-        let defocus_radius = self.focus_dist * (degrees_to_radians(self.defocus_angle) / 2.0).tan();
+        let defocus_radius = self.focus_dist * (degrees_to_radians(self.defocus_angle / 2.0)).tan();
         self.defocus_disk_u = self.u * defocus_radius;
         self.defocus_disk_v = self.v * defocus_radius;
     }
