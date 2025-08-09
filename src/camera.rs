@@ -114,7 +114,7 @@ impl Camera {
         // The phenomen is called "shadow acne"
         match world.hit(r, Interval::new(0.0001, f64::INFINITY)) {
             HitResult::Hit(rec) => {
-                let dir = Vec3::random_on_hemisphere(rec.normal);
+                let dir = rec.normal + Vec3::random_unit_vector();
                 return 0.5 * Camera::ray_color(&Ray::new(rec.point, dir), depth - 1, world);
             }
             HitResult::NoHit => (),
