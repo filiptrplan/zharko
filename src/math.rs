@@ -7,7 +7,6 @@ use std::{
 use interval::Interval;
 use materials::Material;
 use rand::Rng;
-use rand::random;
 
 use crate::renderers::{self, Color};
 pub mod hittables;
@@ -28,8 +27,7 @@ pub fn reflect(incoming: &Vec3, normal: &Vec3) -> Vec3 {
 pub fn refract(incoming: &Vec3, normal: &Vec3, refraction_ratio: f64) -> Vec3 {
     let cos_theta = (-1.0 * incoming.dot(normal)).min(1.0);
     let vec_out_perpendicular = refraction_ratio * (*incoming + cos_theta * *normal);
-    let vec_out_parallel =
-        -((1.0 - vec_out_perpendicular.length_squared()).abs().sqrt()) * *normal;
+    let vec_out_parallel = -((1.0 - vec_out_perpendicular.length_squared()).abs().sqrt()) * *normal;
     vec_out_perpendicular + vec_out_parallel
 }
 

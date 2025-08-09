@@ -11,7 +11,7 @@ use zharko::{
     renderers::{Image, PPM},
 };
 
-const IMAGE_WIDTH: usize = 400;
+const IMAGE_WIDTH: usize = 800;
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 
 fn main() {
