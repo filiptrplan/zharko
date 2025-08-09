@@ -24,7 +24,7 @@ fn main() {
     let mut camera = Camera::new(image);
 
     // Camera settings
-    camera.set_samples_per_pixel(500.0);
+    camera.set_samples_per_pixel(500);
     camera.set_max_depth(50);
     camera.set_vfov(20.0);
     camera.set_camera_pos(Vec3::new(13.0, 2.0, 3.0), Vec3::new(0.0, 0.0, 0.0));
@@ -32,7 +32,7 @@ fn main() {
 
     // World
     let mut world = HittableList::new();
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     // Ground
     let ground_material = Rc::new(Lambertian::new(Vec3::new(0.5, 0.5, 0.5)));
@@ -45,28 +45,28 @@ fn main() {
     // Generate many small spheres
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat: f64 = rng.gen();
+            let choose_mat: f64 = rng.random();
             let center = Vec3::new(
-                a as f64 + 0.9 * rng.gen::<f64>(),
+                a as f64 + 0.9 * rng.random::<f64>(),
                 0.2,
-                b as f64 + 0.9 * rng.gen::<f64>(),
+                b as f64 + 0.9 * rng.random::<f64>(),
             );
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     // Diffuse
-                    let albedo = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>())
-                        * Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>());
+                    let albedo = Vec3::new(rng.random::<f64>(), rng.random::<f64>(), rng.random::<f64>())
+                        * Vec3::new(rng.random::<f64>(), rng.random::<f64>(), rng.random::<f64>());
                     let sphere_material = Rc::new(Lambertian::new(albedo));
                     world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
                 } else if choose_mat < 0.95 {
                     // Metal
                     let albedo = Vec3::new(
-                        rng.gen_range(0.5..1.0),
-                        rng.gen_range(0.5..1.0),
-                        rng.gen_range(0.5..1.0),
+                        rng.random_range(0.5..1.0),
+                        rng.random_range(0.5..1.0),
+                        rng.random_range(0.5..1.0),
                     );
-                    let fuzz = rng.gen_range(0.0..0.5);
+                    let fuzz = rng.random_range(0.0..0.5);
                     let sphere_material = Rc::new(Metal::new(albedo, fuzz));
                     world.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
