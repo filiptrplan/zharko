@@ -24,7 +24,7 @@ fn main() {
     let mut camera = Camera::new(image);
 
     // Camera settings
-    camera.set_samples_per_pixel(500);
+    camera.set_samples_per_pixel(500.0);
     camera.set_max_depth(50);
     camera.set_vfov(20.0);
     camera.set_camera_pos(Vec3::new(13.0, 2.0, 3.0), Vec3::new(0.0, 0.0, 0.0));
