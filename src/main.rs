@@ -25,8 +25,9 @@ fn main() {
     // Camera settings
     camera.set_samples_per_pixel(100);
     camera.set_max_depth(50);
-    camera.set_vfov(90.0);
+    camera.set_vfov(20.0);
     camera.set_camera_pos(Vec3::new(-2.0, 2.0, 1.0), Vec3::new(0.0, 0.0, -1.0));
+    camera.set_aperture(5.0, 3.5);
 
     // Materials
     let material_ground = Rc::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
