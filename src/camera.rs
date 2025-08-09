@@ -20,6 +20,7 @@ pub struct Camera {
     pixel00_loc: Vec3,
     image: Image,
     max_depth: i32,
+    vfov: f64,
 }
 
 impl Camera {
@@ -65,6 +66,7 @@ impl Camera {
             pixel_delta_v,
             pixel00_loc,
             image,
+            vfov,
         }
     }
 
@@ -117,6 +119,44 @@ impl Camera {
 
     pub fn set_max_depth(&mut self, depth: i32) {
         self.max_depth = depth;
+    }
+
+    pub fn set_vfov(&mut self, vfov: f64) {
+        self.vfov = vfov;
+        self.recalculate_viewport();
+    }
+
+    fn recalculate_viewport(&mut self) {
+        let image_width = self.image.width;
+        let image_height = self.image.height;
+
+        // Calculate viewport dimensions
+        let theta = degrees_to_radians(self.vfov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h * FOCAL_LENGTH;
+
+        // We re-calculate the aspect ratio because when calculating the image width we can
+        // introduce rounding errors.
+        let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
+
+        // Camera is placed at origin
+        self.camera_center = Vec3::new(0.0, 0.0, 0.0);
+
+        // We are using right-handed coordinates: y is up, x is right, negative z is the camera dir
+        // Vectors describing the viewport
+        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
+        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+
+        // Pixel-to-pixel deltas
+        self.pixel_delta_u = viewport_u / image_width as f64;
+        self.pixel_delta_v = viewport_v / image_height as f64;
+
+        // Location of the upper left pixel
+        let viewport_upper_left = self.camera_center
+            - Vec3::new(0.0, 0.0, FOCAL_LENGTH)
+            - (viewport_u / 2.0)
+            - (viewport_v / 2.0);
+        self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
     }
 
     fn ray_color(r: &Ray, depth: i32, world: &impl Hittable) -> Vec3 {
