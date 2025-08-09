@@ -1,4 +1,6 @@
-use super::{interval::Interval, HitRecord, HitResult, Hittable, Ray, Vec3};
+use std::rc::Rc;
+
+use super::{interval::Interval, materials::Material, HitRecord, HitResult, Hittable, Ray, Vec3};
 
 pub struct HittableList {
     pub objects: Vec<Box<dyn Hittable>>,
@@ -46,11 +48,16 @@ impl Hittable for HittableList {
 pub struct Sphere {
     center: Vec3,
     radius: f64,
+    mat: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64) -> Self {
-        Sphere { center, radius }
+    pub fn new(center: Vec3, radius: f64, mat: Rc<dyn Material>) -> Self {
+        Sphere {
+            center,
+            radius,
+            mat,
+        }
     }
 }
 
@@ -82,6 +89,7 @@ impl Hittable for Sphere {
             point: r.at(root),
             normal: (r.at(root) - self.center) / self.radius,
             front_face: false,
+            mat: self.mat.clone(),
         };
 
         let outward_normal = (record.point - self.center) / self.radius;

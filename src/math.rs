@@ -1,17 +1,25 @@
 use std::{
     f64::consts::PI,
     ops::{Add, Div, Mul, Sub},
+    rc::Rc,
 };
 
 use interval::Interval;
+use materials::Material;
 use rand::Rng;
 
 use crate::renderers::{self, Color};
 pub mod hittables;
 pub mod interval;
+pub mod materials;
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0
+}
+
+/// Reflects the incoming ray according to the surface defined by the normal
+pub fn reflect(incoming: &Vec3, normal: &Vec3) -> Vec3 {
+    *incoming - 2.0 * incoming.dot(normal) * *normal
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -32,6 +40,11 @@ impl Vec3 {
             y: 0.0,
             z: 0.0,
         }
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let d = 1e-8;
+        self.x.abs() < d && self.y.abs() < d && self.z.abs() < d
     }
 
     // Dot product
@@ -233,6 +246,8 @@ pub struct HitRecord {
     pub t: f64,
     /// Tracks whether we hit the front face of the object
     pub front_face: bool,
+    /// The material of the hit object
+    pub mat: Rc<dyn Material>,
 }
 
 impl HitRecord {

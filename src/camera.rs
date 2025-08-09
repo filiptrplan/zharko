@@ -112,12 +112,14 @@ impl Camera {
         // We ignore hits very close to the surface as they could be below the surface and
         // cause rays to bounce inside the object
         // The phenomen is called "shadow acne"
-        match world.hit(r, Interval::new(0.0001, f64::INFINITY)) {
-            HitResult::Hit(rec) => {
-                let dir = rec.normal + Vec3::random_unit_vector();
-                return 0.5 * Camera::ray_color(&Ray::new(rec.point, dir), depth - 1, world);
+        if let HitResult::Hit(rec) = world.hit(r, Interval::new(0.0001, f64::INFINITY)) {
+            // We choose the direction according to the Lambertian distribution.
+            if let Some(scatter_res) = rec.mat.scatter(r, &rec) {
+                return scatter_res.attenuation
+                    * Camera::ray_color(&scatter_res.scattered, depth - 1, world);
+            } else {
+                return Vec3::zero();
             }
-            HitResult::NoHit => (),
         }
 
         let unit_dir = r.dir.unit();
