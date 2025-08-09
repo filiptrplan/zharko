@@ -25,49 +25,21 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(image: Image) -> Self {
-        let image_width = image.width;
-        let image_height = image.height;
-
-        // Calculate viewport dimensions
         let vfov = 90.0;
-        let theta = degrees_to_radians(vfov);
-        let h = (theta / 2.0).tan();
-        let viewport_height = 2.0 * h * FOCAL_LENGTH;
-
-        // We re-calculate the aspect ratio because when calculating the image width we can
-        // introduce rounding errors.
-        let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
-
-        // Camera is placed at origin
-        let camera_center = Vec3::new(0.0, 0.0, 0.0);
-
-        // We are using right-handed coordinates: y is up, x is right, negative z is the camera dir
-        // Vectors describing the viewport
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
-
-        // Pixel-to-pixel deltas
-        let pixel_delta_u = viewport_u / image_width as f64;
-        let pixel_delta_v = viewport_v / image_height as f64;
-
-        // Location of the upper left pixel
-        let viewport_upper_left = camera_center
-            - Vec3::new(0.0, 0.0, FOCAL_LENGTH)
-            - (viewport_u / 2.0)
-            - (viewport_v / 2.0);
-        let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
-
-        Self {
+        let mut camera = Self {
             samples_per_pixel: 20,
             max_depth: 10,
             pixel_scale_factor: 1.0 / 20.0,
-            camera_center,
-            pixel_delta_u,
-            pixel_delta_v,
-            pixel00_loc,
+            camera_center: Vec3::new(0.0, 0.0, 0.0),
+            pixel_delta_u: Vec3::zero(),
+            pixel_delta_v: Vec3::zero(),
+            pixel00_loc: Vec3::zero(),
             image,
             vfov,
-        }
+        };
+        
+        camera.calculate_viewport();
+        camera
     }
 
     fn sample_square() -> Vec3 {
@@ -123,10 +95,10 @@ impl Camera {
 
     pub fn set_vfov(&mut self, vfov: f64) {
         self.vfov = vfov;
-        self.recalculate_viewport();
+        self.calculate_viewport();
     }
 
-    fn recalculate_viewport(&mut self) {
+    fn calculate_viewport(&mut self) {
         let image_width = self.image.width;
         let image_height = self.image.height;
 
