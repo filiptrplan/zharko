@@ -105,7 +105,7 @@ impl Camera {
 
     fn defocus_disk_sample(&self) -> Vec3 {
         let rand_disk = Vec3::random_in_unit_disk();
-        self.camera_center + rand_disk.x * self.u + rand_disk.y * self.v
+        self.camera_center + rand_disk.x * self.defocus_disk_u + rand_disk.y * self.defocus_disk_v
     }
 
     pub fn render(&mut self, renderer: impl Renderer, world: &impl Hittable) {
