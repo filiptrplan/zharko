@@ -26,6 +26,14 @@ impl Vec3 {
         Vec3 { x, y, z }
     }
 
+    pub fn zero() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
+    }
+
     // Dot product
     pub fn dot(&self, other: &Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z

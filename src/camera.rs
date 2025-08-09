@@ -20,6 +20,7 @@ pub struct Camera {
     pixel_delta_v: Vec3,
     pixel00_loc: Vec3,
     image: Image,
+    max_depth: i32,
 }
 
 impl Camera {
@@ -52,6 +53,7 @@ impl Camera {
 
         Self {
             samples_per_pixel: 20,
+            max_depth: 10,
             pixel_scale_factor: 1.0 / 20.0,
             camera_center,
             pixel_delta_u,
@@ -90,7 +92,7 @@ impl Camera {
 
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
-                    color = color + self.ray_color(&ray, world);
+                    color = color + Camera::ray_color(&ray, self.max_depth, world);
                 }
 
                 color = color * self.pixel_scale_factor;
@@ -103,11 +105,17 @@ impl Camera {
         renderer.draw(&self.image);
     }
 
-    fn ray_color(&self, r: &Ray, world: &impl Hittable) -> Vec3 {
-        match world.hit(r, Interval::new(0.0, f64::INFINITY)) {
+    fn ray_color(r: &Ray, depth: i32, world: &impl Hittable) -> Vec3 {
+        if depth <= 0 {
+            return Vec3::zero();
+        }
+        // We ignore hits very close to the surface as they could be below the surface and
+        // cause rays to bounce inside the object
+        // The phenomen is called "shadow acne"
+        match world.hit(r, Interval::new(0.0001, f64::INFINITY)) {
             HitResult::Hit(rec) => {
                 let dir = Vec3::random_on_hemisphere(rec.normal);
-                return 0.5 * self.ray_color(&Ray::new(rec.point, dir), world);
+                return 0.5 * Camera::ray_color(&Ray::new(rec.point, dir), depth - 1, world);
             }
             HitResult::NoHit => (),
         }
