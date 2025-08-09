@@ -5,7 +5,7 @@ use zharko::{
     camera::Camera,
     math::{
         hittables::{HittableList, Sphere},
-        materials::{Lambertian, Metal},
+        materials::{Dielectric, Lambertian, Metal},
         Vec3,
     },
     renderers::{Image, PPM},
@@ -25,7 +25,8 @@ fn main() {
     // Materials
     let material_ground = Rc::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
     let material_center = Rc::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5)));
-    let material_left = Rc::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3));
+    let material_left = Rc::new(Dielectric::new(1.5));
+    let material_bubble = Rc::new(Dielectric::new(1.0 / 1.5));
     let material_right = Rc::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0));
 
     // World
@@ -49,6 +50,11 @@ fn main() {
         Vec3::new(1.0, 0.0, -1.0),
         0.5,
         material_right,
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.4,
+        material_bubble,
     )));
 
     camera.render(renderer, &world);

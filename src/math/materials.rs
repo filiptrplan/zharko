@@ -1,4 +1,6 @@
-use super::{reflect, HitRecord, Ray, Vec3};
+use rand::random;
+
+use super::{reflect, refract, HitRecord, Ray, Vec3};
 
 pub struct ScatterResult {
     /// How much of the incoming ray will be attenuated (absorbed)
@@ -62,6 +64,52 @@ impl Material for Metal {
         Some(ScatterResult {
             scattered: Ray::new(rec.point, reflected),
             attenuation: self.albedo,
+        })
+    }
+}
+
+pub struct Dielectric {
+    refraction_index: f64,
+}
+
+impl Dielectric {
+    pub fn new(refraction_index: f64) -> Self {
+        Self { refraction_index }
+    }
+
+    /// Use Schlick's approximation for reflectance
+    fn reflectance(cosine: f64, refraction_index: f64) -> f64 {
+        let r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
+        let r1 = r0 * r0;
+        r1 + (1.0 - r1) * (1.0 - cosine).powi(5)
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<ScatterResult> {
+        let ri = if rec.front_face {
+            1.0 / self.refraction_index
+        } else {
+            self.refraction_index
+        };
+
+        let unit_dir = r.dir.unit();
+        let cos_theta = (-1.0 * unit_dir.dot(&rec.normal)).min(1.0);
+        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+        // Sometimes the Snell's law equation cannot be solved and therefore we have perfect
+        // internal reflection which we handle here.
+        let cannot_refract = ri * sin_theta > 1.0;
+        let direction =
+            if cannot_refract || Dielectric::reflectance(cos_theta, ri) > random::<f64>() {
+                reflect(&unit_dir, &rec.normal)
+            } else {
+                refract(&unit_dir, &rec.normal, ri)
+            };
+
+        Some(ScatterResult {
+            scattered: Ray::new(rec.point, direction),
+            attenuation: Vec3::new(1.0, 1.0, 1.0),
         })
     }
 }
