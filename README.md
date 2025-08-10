@@ -5,6 +5,8 @@
 Hello! This is a simple ray tracer written in Rust for my mathematical modelling course. It is not meant to be
 a serious project, I just took the opportunity to combine my course work and my Rust learning journey.
 
+Most of the project is a Rust rewrite of the book [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html) by Peter Shirley, Trevor David Black and Steve Hollasch.
+
 ## ✨ Features
 
 - **Progressive Rendering with Progress Bar:** Renders the image sample by sample, providing visual feedback via a progress bar (using the `indicatif` crate). This is useful for long renders.
