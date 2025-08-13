@@ -4,6 +4,7 @@
 \usepackage{csquotes}
 \usepackage{biblatex}
 \usepackage{amsmath}
+\usepackage{float}
 \addbibresource{porocilo.bib}
 \graphicspath{{images/}}
 \title{Zharko - upodabljanje s sledenjem žarkov}
@@ -35,8 +36,8 @@ zgresi naso kamero, bomo obrnili smer zarkov in jih bomo izstrelili iz kamere.
 Zarek bo potoval iz kamere skozi piksel nasem vidnem oknu (\textit{viewport}) ter se nato odbil po
 virtualnem svetu dokler ne bo dosegel svetlobnega vira (v nasem primeru bo to nebo).
 
-\begin{figure}[h]
-
+\begin{figure}[H]
+	\includegraphics[width=\textwidth]{shema_zarki}
 	\caption{Shema sledenja zarkov}
 \end{figure}
 
@@ -93,7 +94,7 @@ smatramo, kot da zarek ni zadel objekta, saj je za kamero.
 
 Na sliki \ref{fig:red_sphere} vidimo primer izrisa sfere, kjer jo samo obarvamo samo z rdeco barvo.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\label{fig:red_sphere}
 	\includegraphics[width=\textwidth]{red_sphere}
 	\caption{Rdece obarvana sfera}
@@ -114,7 +115,7 @@ videza, ker se zarki nakljucno odbijejo od povrsine objekta. Lambertov odboj je 
 ki pravi, da naj je smer odbitega zarka izbrana sorazmerno s kolicino $\cos (\phi) $, kjer je $\phi$ vpadni
 kot.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\includegraphics[height=250pt]{shema_difzuni}
 	\caption{Lambertov odboj}
@@ -124,7 +125,7 @@ Ce zarek seka objekt na tocki $P$ in je normala povrsine vektor $n$, potem izber
 znotraj enotske sfere s srediscem $P + n$ (kjer je normala enotski vektor). Smer odbitega zarka je potem
 $Q - P$.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=400pt]{difuzni}
 	\caption{Dve difuzni sferi}
@@ -144,7 +145,7 @@ Kovine imajo svojo barvo, vendar pa hkrati tudi odbijejo del svetlobe pod istim 
 zarek srecal objekt. Odbiti zarek je sestavljen iz dveh delov: zrcaljeni del in t.i. zamegljeni del
 (\textit{fuzziness}). Koncni odbiti zarek je vsota teh dveh vektorjev.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=400pt]{metal}
 	\caption{Odboj zarka od kovinskega materiala}
