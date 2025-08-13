@@ -155,6 +155,48 @@ Zrcaljeni del je preprosto vpadni zarek zrcaljen cez ploskev, ki jo opise normal
 Zameglejni del pa simulira hrapavost kovine in je samo nakljucni vektor znotraj enotske sfere pomnozen
 s parametrom $0 \leq f \leq 1$, ki kontrolira kako zamegljen je objekt.
 
+\subsection{Dielektricni materiali}
+Še zadnja vrsta materialov, ki jih uporabljamo, so prosojni materiali oziroma dielektriki. To so na primer voda,
+steklo in diamant. Ko svetloba preide skozi te materiale se upogne, ko prehaja med dvema materialoma z
+različnima lomnima kolicnikoma. Na primer, zrak ima kolicnik blizu 1, steklo pa okoli 1,5. Lom svetlobe opisujemo
+z lomnim zakonom.
+
+$$
+	tukaj zakon
+$$
+
+% tukaj bom dal se diagram zakona
+
+Lomni zakon ni vedno rešljiv — pri prevelikem vpadnem kotu nastopi popolni notranji odboj — svetloba se v takem
+primeru v celoti odbije od meje med materialoma, namesto da bi prešla v drugi medij. Tudi ce je enacba resljiva
+pa se svetloba ne lomi v celoti, nek delez se vedno odbije od materiala. Ta pojav opisujejo Fresnelove enacbe, ki
+so odvisne od vpadnega kota. Ker pa je resevanje tega sistema pocasno, v praksi uporabimo polinomsko Schlickovo
+aproksimacijo
+
+$$
+	schlickova aproksimacija
+$$
+
+Torej v praksi bomo uporabljali Monte Carlo metodo, kjer se zarek odbije od povrsine materiala, ce lomni zakon
+ni resljiv ali pa velja $nakljucno stevilo < Schlickova aproksimacija$.
+
+\section{Globinska ostrina}
+
+V pravi kameri je leča sestavljena iz več steklenih elementov, ki so za odprtino, ki ji pravimo zaslonka.
+Zaradi tega, ker je ta odprtina vecja od tocke, bodo objekti na doloceni razdalje povsem ostri, ostali pa
+zamegljeni. Temu pojavu pravimo globinska ostrina. Namesto modeliranja kompleksnega sistema vecih elementov
+pa bomo uporabili model tanke lece.
+
+% skica tanke lece in zakaj zarki niso ostri
+
+Efekt bomo simulirali tako, da se bomo pretvarjali, da je pozicija nase kamere v resnici pozicija lece in
+da je polozaj nasega vidnega okna ravnina, kjer bodo objekti izostreni.
+
+Kako to dosežemo? Izhodišča žarkov naključno zamaknemo za vektor, izbran v enotskem krogu, in ga skaliramo s
+faktorjem, izračunanim glede na odprtost zaslonke. Ti žarki so nato usmerjeni točno v ciljni piksel na vidnem
+oknu, vendar zaradi zamaknjenih izhodišč malo odstopajo od pricakovane poti pred in po oknu, kar ustvari učinek
+globinske ostrine.
+
 \printbibliography
 
 \end{document}
