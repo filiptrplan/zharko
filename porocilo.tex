@@ -20,20 +20,20 @@
 	\caption{Končni rezultat}
 \end{figure}
 
-V temu poročilu bom predstavil tehniko upodabljaljanja (\textit{rendering}) s sledenjem žarkov
-(\textit{ray tracing}). Lotil se bom prvo osnov sledenja žarkov in bom nato prešel na ustvarjanje treh
-različnih tipov materialov ter končal z simulacijo globinske ostrine (\textit{depth of field}).
+V tem poročilu bom predstavil tehniko upodabljaljanja (\textit{rendering}) s sledenjem žarkov
+(\textit{ray tracing}). Prvo se bom lotil osnov sledenja žarkov, nato prešel na ustvarjanje treh
+različnih tipov materialov, ter končal z simulacijo globinske ostrine (\textit{depth of field}).
 
-Vseskozi poročila se zgledujem po knjigi \textit{Ray Tracing in One Weekend} \cite{Shirley2025RTW1}
+Tekom poročila se zgledujem po knjigi \textit{Ray Tracing in One Weekend} \cite{Shirley2025RTW1}
 
 \section{Osnove sledenja žarkov}
 
-Osnovna ideja upodabljanja s sledenjem žarkov je, da si predstavljamo prikazano sliko kot ploskev in kamero
-orientirano v 3D prostoru. V realnem svetu svetloba izvira iz svetlobnih virov kot so sonce ali luči in se
-nato odbije od raznih objektov dokler ne doseže našega očesa oz. senzorja na kameri. Ker pa veliko teh žarkov
-zgreši našo kamero, bomo obrnili smer žarkov in jih bomo izstrelili iz kamere.
+Osnovna ideja upodabljanja s sledenjem žarkov je, da si predstavljamo prikazano sliko kot ploskev in kamero,
+ki jo slika orientirano v 3D prostoru. V realnem svetu svetloba izvira iz svetlobnih virov kot so sonce ali luči,
+in se nato odbije od raznih objektov, dokler ne doseže našega očesa oz. senzorja na kameri.
+Ker pa veliko teh žarkov zgreši kamero, bomo obrnili njihovo smer in jih bomo izstrelili iz kamere.
 
-Žarek bo potoval iz kamere skozi piksel našem vidnem oknu (\textit{viewport}) ter se nato odbil po
+Žarek bo potoval iz kamere skozi piksel na našem vidnem oknu (\textit{viewport}) ter se nato odbil po
 virtualnem svetu dokler ne bo dosegel svetlobnega vira (v našem primeru bo to nebo).
 
 \begin{figure}[H]
@@ -42,7 +42,7 @@ virtualnem svetu dokler ne bo dosegel svetlobnega vira (v našem primeru bo to n
 \end{figure}
 
 Vpeljimo par oznak, da si bomo lažje predstavljali kako te žarki potekajo. Pozicijo kamere bomo imenovali $C$,
-levi zgornji piksel bo $P_{00}$ in če so piksli na mreži, bodo enakomerno razporejeni tako da bo v horizontalni
+levi zgornji piksel bo $P_{00}$. Piksle bomo enakomerno razporedili v mrežo, tako da jih bo v horizontalni
 smeri jih ločil vektor $\Delta u$ in v vertikalni $\Delta v$. Prikazane so na sliki \ref{fig:oznake}.
 
 \begin{figure}[h]
@@ -62,7 +62,7 @@ V prihodnje pa bomo obravnavali splošne žarke z izvorom v $O$ in smerjo $\vec{
 
 \section{Detekcija trka}
 
-Trenutno naši žarki samo streljajo v praznino zato bomo zdaj v svet dodali objekte v katere lahko žarki trčijo.
+Trenutno naši žarki samo streljajo v praznino, zato bomo zdaj v svet dodali objekte v katere lahko žarki trčijo.
 Matematično je najlažje opisati sfero. Splošna enačba za sfero s središčem $C$ in radijem $r$ je
 
 \begin{equation}
@@ -76,23 +76,23 @@ Matematično je najlažje opisati sfero. Splošna enačba za sfero s središčem
 	(C - P)(C - P) = r^2
 \end{equation}
 
-Naša točka pa leži na žarku torej dobimo
+Naša točka pa leži na žarku, torej dobimo:
 
 \begin{equation}
 	(C - (O + t \vec{d}))(C - (O + t \vec{d})) = r^2
 \end{equation}
 
-Po nekaj preurejanja enačbe dobimo naslednjo kvadratno enačbo
+Po nekaj preureditvah enačbe dobimo naslednjo kvadratno enačbo
 
 \begin{equation}
 	t^2 \lVert C \rVert ^2  - 2 t \cdot \vec{d} (C - O) + \lVert C - O \rVert ^2  - r^2 = 0
 \end{equation}
 
-S pomočjo diskriminante lahko zlahka preverimo ali naš žarek sploh zadane sfero. Če rešitev obstaja pa vzamemo
+S pomočjo diskriminante lahko zlahka preverimo ali naš žarek sploh zadane sfero. Če obstajata dve rešitvi, vzamemo
 najmanjšo pozitivno (torej najbližjo kameri v smeri pogleda). V primeru, da pozitivna rešitev ne obstaja pa
 smatramo, kot da žarek ni zadel objekta, saj je za kamero.
 
-Na sliki \ref{fig:red_sphere} vidimo primer izrisa sfere, kjer jo samo obarvamo samo z rdeco barvo.
+Na sliki \ref{fig:red_sphere} vidimo primer izrisa sfere, kjer jo obarvamo z rdečo barvo.
 
 \begin{figure}[H]
 	\label{fig:red_sphere}
@@ -100,8 +100,10 @@ Na sliki \ref{fig:red_sphere} vidimo primer izrisa sfere, kjer jo samo obarvamo 
 	\caption{Rdeče obarvana sfera}
 \end{figure}
 
-Na zgornji sliki vidimo, da ima sfera zagast rob. To se zgodi zaradi diskretizacije pikslov v mrežo. Temu
-pojavimo pravimo \textit{aliasing}. Znebimo se ga tako, da za vsak piksel izstrelimo več žarkov ki so naključno
+\subsection{Antialiasing}
+
+Na zgornji sliki vidimo, da ima sfera žagast rob zaradi diskretizacije pikslov v mrežo. Temu
+pojavimo pravimo \textit{aliasing}. Znebimo se ga tako, da za vsak piksel izstrelimo več žarkov, ki so naključno
 pertrubirani za največ polovično razdaljo med piksli, ter nato barvo teh žarkov povprečimo. Tehnika se imenuje
 MSAA (\textit{multisample anti-aliasing}) in smo jo izbrali, ker je v kontekstu sledenja žarkov najbolj
 enostavna za implementirati.
@@ -110,10 +112,9 @@ enostavna za implementirati.
 
 \subsection{Difuzni materiali in Lambertov odboj}
 
-Prve materiali, ki se jih bomo lotili so difuzni. Taki materiali v realnem svetu zgledajo mat in so takega
-videza, ker se žarki naključno odbijejo od površine objekta. Lambertov odboj je aproksimacija takih materialov,
-ki pravi, da naj je smer odbitega žarka izbrana sorazmerno s količino $\cos (\phi) $, kjer je $\phi$ vpadni
-kot.
+Prvi materiali, ki se jih bomo lotili, so difuzni. V realnem svetu zgledajo mat, ker se žarki naključno odbijejo od
+površine objekta. Lambertov odboj je aproksimacija difuznih materialov, ki pravi, da naj je smer odbitega žarka
+izbrana sorazmerno s količino $\cos (\phi) $, kjer je $\phi$ vpadni kot.
 
 \begin{figure}[H]
 	\centering
@@ -132,7 +133,7 @@ $Q - P$.
 \end{figure}
 
 Da dodamo barvo, odbiti žarek pomnožimo z barvo objekta, ki ji pravimo \textit{albedo}. Tako se barva
-svetlobnega vira postopoma spreminja ob vsakem odboju - množi se z albedo vsakega objekta, s katerim se
+svetlobnega vira postopoma spreminja ob vsakem odboju - množi se z albedom vsakega objekta, s katerim se
 žarek sreča. Končna barva piksla je zato produkt barve svetlobnega vira in vseh albedo vrednosti
 objektov na poti žarka.
 
@@ -152,41 +153,41 @@ Kovine imajo svojo barvo, vendar pa hkrati tudi odbijejo del svetlobe pod istim 
 \end{figure}
 
 Zrcaljeni del je preprosto vpadni žarek zrcaljen čez ploskev, ki jo opiše normala in z zamenjano smerjo.
-Zameglejni del pa simulira hrapavost kovine in je samo naključni vektor znotraj enotske sfere pomnožen
+Zameglejni del pa simulira hrapavost kovine z naključnim vektor znotraj enotske sfere pomnoženim
 s parametrom $0 \leq f \leq 1$, ki kontrolira kako zamegljen je objekt.
 
 \subsection{Dielektrični materiali}
 Še zadnja vrsta materialov, ki jih uporabljamo, so prosojni materiali oziroma dielektriki. To so na primer voda,
-steklo in diamant. Ko svetloba preide skozi te materiale se upogne, ko prehaja med dvema materialoma z
-različnima lomnima količnikoma. Na primer, zrak ima količnik blizu 1, steklo pa okoli 1,5. Lom svetlobe opisujemo
-z lomnim zakonom.
+steklo in diamant. Ko svetloba prehaja med dvema materialoma z različnima lomnima količnikoma, se upogne.
+Na primer, zrak ima količnik blizu $1$, steklo pa okoli $1,5$. Lom svetlobe opisujemo z lomnim zakonom.
 
 $$
-\begin{aligned}
-n_1 \sin\theta_1 &= n_2 \sin\theta_2, \\
-\cos\theta_1 &= -\frac{\vec{d}}{\lVert \vec{d} \rVert} \cdot \vec{n}, \\
-\vec{t} &= \eta \left(\frac{\vec{d}}{\lVert \vec{d} \rVert} + \cos\theta_1\,\vec{n}\right)
-          - \vec{n}\,\sqrt{1 - \eta^2\!\left(1 - \cos^2\theta_1\right)}, \quad \eta = \frac{n_1}{n_2}.
-\end{aligned}
+	\begin{aligned}
+		n_1 \sin\theta_1 & = n_2 \sin\theta_2,                                                               \\
+		\cos\theta_1     & = -\frac{\vec{d}}{\lVert \vec{d} \rVert} \cdot \vec{n},                           \\
+		\vec{t}          & = \eta \left(\frac{\vec{d}}{\lVert \vec{d} \rVert} + \cos\theta_1\,\vec{n}\right)
+		- \vec{n}\,\sqrt{1 - \eta^2\!\left(1 - \cos^2\theta_1\right)}, \quad \eta = \frac{n_1}{n_2}.
+	\end{aligned}
 $$
 
 % tukaj bom dal se diagram zakona
 
 Lomni zakon ni vedno rešljiv — pri prevelikem vpadnem kotu nastopi popolni notranji odboj — svetloba se v takem
-primeru v celoti odbije od meje med materialoma, namesto da bi prešla v drugi medij. Tudi če je enačba rešljiva
-pa se svetloba ne lomi v celoti, nek delež se vedno odbije od materiala. Ta pojav opisujejo Fresnelove enačbe, ki
+primeru v celoti odbije od meje med materialoma, namesto da bi prešla v drugi medij. Tudi če je enačba rešljiva,
+se svetloba ne lomi v celoti, nek delež se vedno odbije od materiala. Točen delež opisujejo Fresnelove enačbe, ki
 so odvisne od vpadnega kota. Ker pa je reševanje tega sistema počasno, v praksi uporabimo polinomsko Schlickovo
 aproksimacijo
 
 $$
-\begin{aligned}
-R(\theta) &\approx R_0 + (1 - R_0)\,(1 - \cos\theta)^5, \\
-R_0 &= \left(\frac{n_1 - n_2}{n_1 + n_2}\right)^2.
-\end{aligned}
+	\begin{aligned}
+		R(\theta) & \approx R_0 + (1 - R_0)\,(1 - \cos\theta)^5,  \\
+		R_0       & = \left(\frac{n_1 - n_2}{n_1 + n_2}\right)^2.
+	\end{aligned}
 $$
 
 Torej v praksi bomo uporabljali Monte Carlo metodo, kjer se žarek odbije od površine materiala, če lomni zakon
-ni rešljiv ali pa velja $naključno število < Schlickova aproksimacija$.
+ni rešljiv ali pa velja $\verb|naključno število| < \verb|Schlickova aproksimacija|$ (torej vzorcimo
+iz Bernoullijeve distribucije z verjetnostjo $R(\theta)$).
 
 \section{Globinska ostrina}
 
