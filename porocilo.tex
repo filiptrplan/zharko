@@ -162,7 +162,12 @@ različnima lomnima količnikoma. Na primer, zrak ima količnik blizu 1, steklo 
 z lomnim zakonom.
 
 $$
-	tukaj zakon
+\begin{aligned}
+n_1 \sin\theta_1 &= n_2 \sin\theta_2, \\
+\cos\theta_1 &= -\frac{\vec{d}}{\lVert \vec{d} \rVert} \cdot \vec{n}, \\
+\vec{t} &= \eta \left(\frac{\vec{d}}{\lVert \vec{d} \rVert} + \cos\theta_1\,\vec{n}\right)
+          - \vec{n}\,\sqrt{1 - \eta^2\!\left(1 - \cos^2\theta_1\right)}, \quad \eta = \frac{n_1}{n_2}.
+\end{aligned}
 $$
 
 % tukaj bom dal se diagram zakona
@@ -174,7 +179,10 @@ so odvisne od vpadnega kota. Ker pa je reševanje tega sistema počasno, v praks
 aproksimacijo
 
 $$
-	schlickova aproksimacija
+\begin{aligned}
+R(\theta) &\approx R_0 + (1 - R_0)\,(1 - \cos\theta)^5, \\
+R_0 &= \left(\frac{n_1 - n_2}{n_1 + n_2}\right)^2.
+\end{aligned}
 $$
 
 Torej v praksi bomo uporabljali Monte Carlo metodo, kjer se žarek odbije od površine materiala, če lomni zakon
