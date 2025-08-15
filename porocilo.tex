@@ -28,8 +28,8 @@ Tekom poročila se zgledujem po knjigi \textit{Ray Tracing in One Weekend} \cite
 
 \section{Osnove sledenja žarkov}
 
-Osnovna ideja upodabljanja s sledenjem žarkov je, da si predstavljamo prikazano sliko kot ploskev in kamero,
-ki jo slika orientirano v 3D prostoru. V realnem svetu svetloba izvira iz svetlobnih virov kot so sonce ali luči,
+Osnovna ideja upodabljanja s sledenjem žarkov je, da si predstavljamo prikazano sliko kot ploskev in kamero
+kot točko v 3D prostoru. V realnem svetu svetloba izvira iz svetlobnih virov kot so sonce ali luči,
 in se nato odbije od raznih objektov, dokler ne doseže našega očesa oz. senzorja na kameri.
 Ker pa veliko teh žarkov zgreši kamero, bomo obrnili njihovo smer in jih bomo izstrelili iz kamere.
 
@@ -43,7 +43,7 @@ virtualnem svetu dokler ne bo dosegel svetlobnega vira (v našem primeru bo to n
 
 Vpeljimo par oznak, da si bomo lažje predstavljali kako te žarki potekajo. Pozicijo kamere bomo imenovali $C$,
 levi zgornji piksel bo $P_{00}$. Piksle bomo enakomerno razporedili v mrežo, tako da jih bo v horizontalni
-smeri jih ločil vektor $\Delta u$ in v vertikalni $\Delta v$. Prikazane so na sliki \ref{fig:oznake}.
+smeri ločil vektor $\Delta u$ in v vertikalni $\Delta v$. Prikazane so na sliki \ref{fig:oznake}.
 
 \begin{figure}[h]
 	\centering
@@ -52,7 +52,7 @@ smeri jih ločil vektor $\Delta u$ in v vertikalni $\Delta v$. Prikazane so na s
 	\label{fig:oznake}
 \end{figure}
 
-Potem lahko žarek $\vec{r}$, ki potuje skozi piksel $(i,j)$ parametriziramo s $t$:
+Potem lahko žarek $\vec{r}$, ki potuje skozi piksel $(i,j)$, parametriziramo s $t$:
 
 \begin{equation}
 	\vec{r} = C + t \cdot (P_{00} + i \cdot \Delta u + j \cdot \Delta v - C)
@@ -70,7 +70,7 @@ Matematično je najlažje opisati sfero. Splošna enačba za sfero s središčem
 	(C_{x} - x)^2  + (C_{y} - y)^2  + (C_{z} - z)^2  = r^2
 \end{equation}
 
-Če točko $(x,y,z)$ označimo kot $P$ lahko \ref{eq:sfera} zapišemo kot skalarni produkt.
+Če točko $(x,y,z)$ označimo kot $P$ lahko enačbo \ref{eq:sfera} zapišemo kot skalarni produkt.
 
 \begin{equation}
 	(C - P)(C - P) = r^2
@@ -159,31 +159,38 @@ s parametrom $0 \leq f \leq 1$, ki kontrolira kako zamegljen je objekt.
 \subsection{Dielektrični materiali}
 Še zadnja vrsta materialov, ki jih uporabljamo, so prosojni materiali oziroma dielektriki. To so na primer voda,
 steklo in diamant. Ko svetloba prehaja med dvema materialoma z različnima lomnima količnikoma, se upogne.
-Na primer, zrak ima količnik blizu $1$, steklo pa okoli $1,5$. Lom svetlobe opisujemo z lomnim zakonom.
+Na primer, zrak ima količnik blizu $1$, steklo pa okoli $1.5$. Lom svetlobe opisujemo z lomnim zakonom, ki nam
+pove razmerje vpadnim kotom $\theta$ in kotom lomljenega žarka $\theta'$. Lomne količnike materialov pa označimo
+z $\eta$ in $\eta'$. S pomočjo tega zakona lahko izrazimo lomljeni žarek $\vec{t}$, ki preide skozi mejo med materialoma
+z normalo $\vec{n}$.
 
-$$
+\begin{equation}
 	\begin{aligned}
-		n_1 \sin\theta_1 & = n_2 \sin\theta_2,                                                               \\
-		\cos\theta_1     & = -\frac{\vec{d}}{\lVert \vec{d} \rVert} \cdot \vec{n},                           \\
-		\vec{t}          & = \eta \left(\frac{\vec{d}}{\lVert \vec{d} \rVert} + \cos\theta_1\,\vec{n}\right)
-		- \vec{n}\,\sqrt{1 - \eta^2\!\left(1 - \cos^2\theta_1\right)}, \quad \eta = \frac{n_1}{n_2}.
+		\eta \sin\theta & = \eta' \sin\theta',                                                              \\
+		\cos\theta      & = -\frac{\vec{d}}{\lVert \vec{d} \rVert} \cdot \vec{n},                           \\
+		\vec{t}         & = \eta_1 \left(\frac{\vec{d}}{\lVert \vec{d} \rVert} + \cos\theta\,\vec{n}\right)
+		- \vec{n}\,\sqrt{1 - \eta_{1}^2\!\left(1 - \cos^2\theta\right)}, \quad \eta_{1} = \frac{\eta}{\eta'}.
 	\end{aligned}
-$$
+\end{equation}
 
-% tukaj bom dal se diagram zakona
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{lomni_zakon}
+	\caption{Lomni zakon}
+\end{figure}
 
 Lomni zakon ni vedno rešljiv — pri prevelikem vpadnem kotu nastopi popolni notranji odboj — svetloba se v takem
 primeru v celoti odbije od meje med materialoma, namesto da bi prešla v drugi medij. Tudi če je enačba rešljiva,
 se svetloba ne lomi v celoti, nek delež se vedno odbije od materiala. Točen delež opisujejo Fresnelove enačbe, ki
 so odvisne od vpadnega kota. Ker pa je reševanje tega sistema počasno, v praksi uporabimo polinomsko Schlickovo
-aproksimacijo
+aproksimacijo, ki nam pove delež odbite svetlobe.
 
-$$
+\begin{equation}
 	\begin{aligned}
 		R(\theta) & \approx R_0 + (1 - R_0)\,(1 - \cos\theta)^5,  \\
 		R_0       & = \left(\frac{n_1 - n_2}{n_1 + n_2}\right)^2.
 	\end{aligned}
-$$
+\end{equation}
 
 Torej v praksi bomo uporabljali Monte Carlo metodo, kjer se žarek odbije od površine materiala, če lomni zakon
 ni rešljiv ali pa velja $\verb|naključno število| < \verb|Schlickova aproksimacija|$ (torej vzorcimo
@@ -197,6 +204,11 @@ zamegljeni. Temu pojavu pravimo globinska ostrina. Namesto modeliranja kompleksn
 pa bomo uporabili model tanke leče.
 
 % skica tanke lece in zakaj zarki niso ostri
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{leca}
+	\caption{Shema tanke leče}
+\end{figure}
 
 Efekt bomo simulirali tako, da se bomo pretvarjali, da je pozicija naše kamere v resnici pozicija leče in
 da je položaj našega vidnega okna ravnina, kjer bodo objekti izostreni.
